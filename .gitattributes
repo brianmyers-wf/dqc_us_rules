@@ -1,6 +1,10 @@
 comments/ export-ignore
 meetings/ export-ignore
 docs/DQC_US_0001/ export-ignore
+docs/DQC_US_0013/ export-ignore
+docs/DQC_US_0014/ export-ignore
+docs/DQC_US_0015/DQC_0015_ListOfElements_V2.xlsx export-ignore
+docs/DQC_US_0018/ export-ignore
 docs/DQC_US_0041/ export-ignore
 .gitattributes export-ignore
 .gitignore export-ignore
