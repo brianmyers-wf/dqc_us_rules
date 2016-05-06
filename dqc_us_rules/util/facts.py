@@ -170,12 +170,14 @@ def member_exists(val, fact, member_name):
 
     standard_taxonomies_dict = val.disclosureSystem.standardTaxonomiesDict
 
-    return any(
-        member_name == dim.member.qname.localName
-        for dim in fact.context.segDimValues.values()
-        if dim.isExplicit and dim.member is not None and
-        dim.member.qname.namespaceURI in standard_taxonomies_dict
-    )
+    if _fact_components_valid(fact):
+        return any(
+            member_name == dim.member.qname.localName
+            for dim in fact.context.segDimValues.values()
+            if dim.isExplicit and dim.member is not None and
+            dim.member.qname.namespaceURI in standard_taxonomies_dict
+        )
+    return False
 
 
 def axis_member_exists(val, fact, axis_name, member_name):
@@ -196,15 +198,17 @@ def axis_member_exists(val, fact, axis_name, member_name):
     """
     standard_taxonomies_dict = val.disclosureSystem.standardTaxonomiesDict
 
-    return any(
-        member_name == dim.memberQname.localName and
-        axis_name == dim.dimensionQname.localName
-        for dim in fact.context.segDimValues.values()
-        if dim.isExplicit and dim.memberQname is not None and
-        dim.memberQname.namespaceURI in standard_taxonomies_dict and
-        dim.dimensionQname is not None and
-        dim.dimensionQname.namespaceURI in standard_taxonomies_dict
-    )
+    if _fact_components_valid(fact):
+        return any(
+            member_name == dim.memberQname.localName and
+            axis_name == dim.dimensionQname.localName
+            for dim in fact.context.segDimValues.values()
+            if dim.isExplicit and dim.memberQname is not None and
+            dim.memberQname.namespaceURI in standard_taxonomies_dict and
+            dim.dimensionQname is not None and
+            dim.dimensionQname.namespaceURI in standard_taxonomies_dict
+        )
+    return False
 
 
 def get_facts_with_type(lookup_type_strings, model_xbrl):
@@ -363,17 +367,19 @@ def member_qnames(fact, axis_filter=None):
         the fact's member's qnames.
     :rtype: list [str]
     """
-    if axis_filter:
-        return [
-            str(dim.member.qname) for dim in fact.context.segDimValues.values()
-            if dim.isExplicit and dim.member is not None and dim.dimensionQname
-            is not None and dim.dimensionQname.localName in axis_filter
-        ]
-    else:
-        return [
-            str(dim.member.qname) for dim in fact.context.segDimValues.values()
-            if dim.isExplicit and dim.member is not None
-        ]
+    if _fact_components_valid(fact):
+        if axis_filter:
+            return [
+                str(dim.member.qname) for dim in fact.context.segDimValues.values()
+                if dim.isExplicit and dim.member is not None and dim.dimensionQname
+                is not None and dim.dimensionQname.localName in axis_filter
+            ]
+        else:
+            return [
+                str(dim.member.qname) for dim in fact.context.segDimValues.values()
+                if dim.isExplicit and dim.member is not None
+            ]
+    return []
 
 
 def axis_qnames(fact):
@@ -385,10 +391,12 @@ def axis_qnames(fact):
     :return: a list of the fact's axes.
     :rtype: list [str]
     """
-    return [
-        str(dim.dimensionQname) for dim in fact.context.segDimValues.values()
-        if dim.dimensionQname is not None
-    ]
+    if _fact_components_valid(fact):
+        return [
+            str(dim.dimensionQname) for dim in fact.context.segDimValues.values()
+            if dim.dimensionQname is not None
+        ]
+    return []
 
 
 def grab_numeric_facts(facts_list):
